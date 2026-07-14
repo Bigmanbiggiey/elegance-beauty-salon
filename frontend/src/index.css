@@ -1,0 +1,117 @@
+:root {
+  --ground: #f6f1f0;
+  --surface: #ffffff;
+  --surface-sunken: #fbf6f5;
+  --ink: #241a1f;
+  --ink-soft: #6e5960;
+  --ink-faint: #9c8890;
+  --line: #e6d9d8;
+  --accent: #7a1f3d;
+  --accent-soft: #f3e1e6;
+  --accent-strong: #591530;
+  --brass: #a87c42;
+  --good: #3f7a5a;
+  --good-soft: #e3efe7;
+  --warn: #b8823a;
+  --warn-soft: #f5ead7;
+  --critical: #c1443b;
+  --critical-soft: #f6e1df;
+  --shadow:
+    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+
+  --font-display: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Segoe UI Mono', Consolas, monospace;
+
+  font: 18px/145% var(--font-body);
+  letter-spacing: 0.18px;
+  color-scheme: light dark;
+  color: var(--ink-soft);
+  background: var(--ground);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: #1a1216;
+    --surface: #221a1e;
+    --surface-sunken: #1f151a;
+    --ink: #f3e9ea;
+    --ink-soft: #c2a8af;
+    --ink-faint: #8c747b;
+    --line: #3a2a30;
+    --accent: #d97c99;
+    --accent-soft: #3a1f28;
+    --accent-strong: #f2a8be;
+    --brass: #d4af7a;
+    --good: #6fae86;
+    --good-soft: #22332a;
+    --warn: #d9a54d;
+    --warn-soft: #362a18;
+    --critical: #e07568;
+    --critical-soft: #3a211f;
+    --shadow:
+      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+  }
+}
+
+html,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+}
+
+h1,
+h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: var(--ink);
+}
+
+h1 {
+  font-size: 56px;
+  letter-spacing: -0.01em;
+  margin: 32px 0;
+  @media (max-width: 1024px) {
+    font-size: 36px;
+    margin: 20px 0;
+  }
+}
+h2 {
+  font-size: 24px;
+  line-height: 118%;
+  letter-spacing: -0.01em;
+  margin: 0 0 8px;
+  @media (max-width: 1024px) {
+    font-size: 20px;
+  }
+}
+p {
+  margin: 0;
+}
+
+code,
+.counter {
+  font-family: var(--font-mono);
+  display: inline-flex;
+  border-radius: 4px;
+  color: var(--ink);
+}
+
+code {
+  font-size: 15px;
+  line-height: 135%;
+  padding: 4px 8px;
+  background: var(--surface-sunken);
+}
