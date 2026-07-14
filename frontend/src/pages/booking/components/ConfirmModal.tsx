@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import type { GuestDetails, Service, Staff } from '../../../types'
 
 export function ConfirmModal({
@@ -22,8 +23,23 @@ export function ConfirmModal({
   onCancel: () => void
 }) {
   return (
-    <div className="modal-overlay" onClick={onCancel}>
-      <div className="modal-panel" onClick={(e) => e.stopPropagation()}>
+    <motion.div
+      className="modal-overlay"
+      onClick={onCancel}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      <motion.div
+        className="modal-panel"
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, y: 28 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 28 }}
+        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <div className="modal-panel__handle" />
         <h2>Confirm your booking</h2>
 
         <div className="summary-row">
@@ -68,7 +84,11 @@ export function ConfirmModal({
           </div>
         )}
 
-        {error && <p className="error-text" style={{ marginTop: 12 }}>{error}</p>}
+        {error && (
+          <p className="error-text" style={{ marginTop: 12 }}>
+            {error}
+          </p>
+        )}
 
         <div className="modal-panel__actions" style={{ marginTop: 16 }}>
           <button type="button" className="primary-button" onClick={onConfirm} disabled={submitting}>
@@ -78,7 +98,7 @@ export function ConfirmModal({
             Go back
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }

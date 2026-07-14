@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useState, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { createAppointment } from '../../api/appointments'
 import { ApiError } from '../../api/client'
@@ -6,17 +7,34 @@ import type { GuestDetails as GuestDetailsType, Service, Staff } from '../../typ
 import { ConfirmModal } from './components/ConfirmModal'
 import { DetailsSection } from './components/DetailsSection'
 import { ServiceSection } from './components/ServiceSection'
-import { StaffSection } from './components/StaffSection'
 import { StepSummary } from './components/StepSummary'
-import { TimeSection } from './components/TimeSection'
+import { TimeStylistSection } from './components/TimeStylistSection'
 
 function today(): string {
   return new Date().toISOString().slice(0, 10)
 }
 
+function StepFade({ stateKey, children }: { stateKey: string; children: ReactNode }) {
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={stateKey}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
+  )
+}
+
 export function BookingPage() {
   const location = useLocation()
-  const preselectedService = (location.state as { service?: Service } | null)?.service ?? null
+  const navState = location.state as { service?: Service; staff?: Staff } | null
+  const preselectedService = navState?.service ?? null
+  const preselectedStaff = navState?.staff ?? null
 
   const [service, setService] = useState<Service | null>(preselectedService)
   const [staff, setStaff] = useState<Staff | null>(null)
@@ -33,15 +51,18 @@ export function BookingPage() {
 
   const navigate = useNavigate()
 
+  const stepIndex = !service ? 0 : !slot ? 1 : 2
+  const stepLabels = ['Service', 'Time & stylist', 'Your details']
+
   const handleBack = () => {
     if (slot) {
       setSlot(null)
-      setConflictMessage(null)
-    } else if (staff) {
       setStaff(null)
+      setConflictMessage(null)
     } else if (service) {
       setService(null)
       setStaff(null)
+      setSlot(null)
     } else {
       navigate('/')
     }
@@ -53,19 +74,15 @@ export function BookingPage() {
     setSlot(null)
   }
 
-  const handleSelectStaff = (selected: Staff) => {
-    setStaff(selected)
-    setSlot(null)
-  }
-
   const handleChangeDate = (nextDate: string) => {
     setDate(nextDate)
     setSlot(null)
     setConflictMessage(null)
   }
 
-  const handleSelectSlot = (selected: string) => {
-    setSlot(selected)
+  const handleSelectSlot = (selectedStaff: Staff, selectedSlot: string) => {
+    setStaff(selectedStaff)
+    setSlot(selectedSlot)
     setConflictMessage(null)
   }
 
@@ -86,6 +103,7 @@ export function BookingPage() {
       if (err instanceof ApiError && err.status === 409) {
         setReviewOpen(false)
         setSlot(null)
+        setStaff(null)
         setConflictMessage('That time was just taken by someone else. Please choose another.')
       } else {
         setSubmitError('Something went wrong submitting your booking. Please try again.')
@@ -97,102 +115,110 @@ export function BookingPage() {
 
   return (
     <div className="page">
-      <button type="button" className="back-link" onClick={handleBack}>
-        ← Back
-      </button>
-      <h1>Book an appointment</h1>
+      <div className="container container--narrow">
+        <button type="button" className="back-link" onClick={handleBack}>
+          ← Back
+        </button>
+        <h1>Book an appointment</h1>
 
-      <div className="booking-section">
-        <span className="booking-section__label">Service</span>
-        {service ? (
-          <StepSummary
-            value={service.name}
-            meta={`${service.duration_minutes} min · $${service.price}`}
-            onChange={() => {
-              setService(null)
-              setStaff(null)
-              setSlot(null)
-            }}
-          />
-        ) : (
-          <ServiceSection onSelect={handleSelectService} />
-        )}
-      </div>
-
-      {service && (
-        <div className="booking-section">
-          <span className="booking-section__label">Stylist</span>
-          {staff ? (
-            <StepSummary
-              value={staff.display_name}
-              onChange={() => {
-                setStaff(null)
-                setSlot(null)
-              }}
-            />
-          ) : (
-            <StaffSection service={service} onSelect={handleSelectStaff} />
-          )}
+        <div className="booking-progress">
+          {stepLabels.map((_, i) => (
+            <span className="booking-progress__step" key={i}>
+              <span
+                className="booking-progress__step-fill"
+                style={{ width: i <= stepIndex ? '100%' : '0%' }}
+              />
+            </span>
+          ))}
+          <span className="booking-progress__label">
+            Step {stepIndex + 1} of {stepLabels.length}
+          </span>
         </div>
-      )}
 
-      {service && staff && (
         <div className="booking-section">
-          <span className="booking-section__label">Date &amp; time</span>
-          {slot ? (
-            <StepSummary
-              value={new Date(slot).toLocaleString([], {
-                weekday: 'short',
-                month: 'short',
-                day: 'numeric',
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: true,
-              })}
-              onChange={() => {
-                setSlot(null)
-                setConflictMessage(null)
-              }}
+          <span className="booking-section__label">Service</span>
+          <StepFade stateKey={service ? `summary-${service.id}` : 'picker'}>
+            {service ? (
+              <StepSummary
+                value={service.name}
+                meta={`${service.duration_minutes} min · $${service.price}`}
+                onChange={() => {
+                  setService(null)
+                  setStaff(null)
+                  setSlot(null)
+                }}
+              />
+            ) : (
+              <ServiceSection onSelect={handleSelectService} />
+            )}
+          </StepFade>
+        </div>
+
+        {service && (
+          <div className="booking-section">
+            <span className="booking-section__label">Date &amp; stylist</span>
+            <StepFade stateKey={slot ? `summary-${slot}` : 'picker'}>
+              {slot && staff ? (
+                <StepSummary
+                  value={new Date(slot).toLocaleString([], {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true,
+                  })}
+                  meta={`with ${staff.display_name}`}
+                  onChange={() => {
+                    setSlot(null)
+                    setStaff(null)
+                    setConflictMessage(null)
+                  }}
+                />
+              ) : (
+                <TimeStylistSection
+                  service={service}
+                  date={date}
+                  onChangeDate={handleChangeDate}
+                  onSelectSlot={handleSelectSlot}
+                  conflictMessage={conflictMessage}
+                  initialStylist={preselectedStaff}
+                />
+              )}
+            </StepFade>
+          </div>
+        )}
+
+        {service && staff && slot && (
+          <div className="booking-section">
+            <span className="booking-section__label">Your details</span>
+            <DetailsSection
+              guest={guest}
+              notes={notes}
+              onChangeGuest={setGuest}
+              onChangeNotes={setNotes}
+              onReview={() => setReviewOpen(true)}
             />
-          ) : (
-            <TimeSection
+          </div>
+        )}
+
+        <AnimatePresence>
+          {reviewOpen && service && staff && slot && (
+            <ConfirmModal
+              key="confirm-modal"
               service={service}
               staff={staff}
-              date={date}
-              onChangeDate={handleChangeDate}
-              onSelectSlot={handleSelectSlot}
-              conflictMessage={conflictMessage}
+              slot={slot}
+              guest={guest}
+              notes={notes}
+              submitting={submitting}
+              error={submitError}
+              onConfirm={handleConfirmSubmit}
+              onCancel={() => setReviewOpen(false)}
             />
           )}
-        </div>
-      )}
-
-      {service && staff && slot && (
-        <div className="booking-section">
-          <span className="booking-section__label">Your details</span>
-          <DetailsSection
-            guest={guest}
-            notes={notes}
-            onChangeGuest={setGuest}
-            onChangeNotes={setNotes}
-            onReview={() => setReviewOpen(true)}
-          />
-        </div>
-      )}
-
-      {reviewOpen && service && staff && slot && (
-        <ConfirmModal
-          service={service}
-          staff={staff}
-          slot={slot}
-          guest={guest}
-          notes={notes}
-          submitting={submitting}
-          error={submitError}
-          onConfirm={handleConfirmSubmit}
-          onCancel={() => setReviewOpen(false)}
-        />
-      )}
+        </AnimatePresence>
+      </div>
     </div>
   )
 }

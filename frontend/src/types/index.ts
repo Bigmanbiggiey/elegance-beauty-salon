@@ -2,14 +2,18 @@ export interface Service {
   id: number
   name: string
   category: string
+  description: string
   duration_minutes: number
   price: string
+  image: string | null
 }
 
 export interface Staff {
   id: number
   display_name: string
   bio: string
+  photo: string | null
+  services: Service[]
 }
 
 export interface Client {

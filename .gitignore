@@ -30,3 +30,10 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# Placeholder photos with third-party branding or unclear rights — local
+# dev-only, not for the shared repo (see project memory: staff-photos review)
+frontend/src/assets/staff-photos/staff 1.jpg
+frontend/src/assets/staff-photos/staff 2.jpg
+frontend/src/assets/staff-photos/staff 3.jpg
+frontend/src/assets/staff-photos/staff 5.jpg

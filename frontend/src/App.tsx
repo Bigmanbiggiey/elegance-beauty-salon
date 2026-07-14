@@ -12,9 +12,12 @@ import { Products } from './pages/admin/Products'
 import { Reports } from './pages/admin/Reports'
 import { Settings } from './pages/admin/Settings'
 import { Today } from './pages/admin/Today'
+import { Contact } from './pages/Contact'
 import { Landing } from './pages/Landing'
+import { ServiceDetail } from './pages/ServiceDetail'
 import { Services } from './pages/Services'
 import { Shop } from './pages/Shop'
+import { Team } from './pages/Team'
 import { BookingPage } from './pages/booking/BookingPage'
 import { Confirmation } from './pages/booking/Confirmation'
 
@@ -25,7 +28,10 @@ function App() {
         <Route element={<PublicShell />}>
           <Route path="/" element={<Landing />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/services/:id" element={<ServiceDetail />} />
           <Route path="/shop" element={<Shop />} />
+          <Route path="/team" element={<Team />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/book" element={<BookingPage />} />
           <Route path="/book/confirmation" element={<Confirmation />} />
           <Route path="/admin/login" element={<Login />} />

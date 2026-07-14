@@ -6,7 +6,7 @@ from .models import Product, Service, Staff
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields = ['id', 'name', 'category', 'duration_minutes', 'price']
+        fields = ['id', 'name', 'category', 'description', 'duration_minutes', 'price', 'image']
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -16,6 +16,8 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class StaffSerializer(serializers.ModelSerializer):
+    services = ServiceSerializer(many=True, read_only=True)
+
     class Meta:
         model = Staff
-        fields = ['id', 'display_name', 'bio']
+        fields = ['id', 'display_name', 'bio', 'photo', 'services']

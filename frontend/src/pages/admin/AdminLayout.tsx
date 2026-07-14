@@ -16,7 +16,7 @@ export function AdminLayout() {
   return (
     <div className="admin-shell">
       <nav className="admin-shell__rail">
-        <span className="admin-shell__brand">Salon Admin</span>
+        <span className="admin-shell__brand">Elegance Beauty Admin</span>
         {NAV_ITEMS.map((item) => (
           <NavLink
             key={item.to}

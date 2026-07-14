@@ -15,8 +15,10 @@ class Weekday(models.IntegerChoices):
 class Service(models.Model):
     name = models.CharField(max_length=100)
     category = models.CharField(max_length=100, blank=True)
+    description = models.TextField(blank=True)
     duration_minutes = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=8, decimal_places=2)
+    image = models.ImageField(upload_to='services/', blank=True, null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -55,6 +57,7 @@ class Staff(models.Model):
     )
     display_name = models.CharField(max_length=100)
     bio = models.TextField(blank=True)
+    photo = models.ImageField(upload_to='staff/', blank=True, null=True)
     services = models.ManyToManyField(Service, related_name='staff', blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
